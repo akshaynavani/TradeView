@@ -126,8 +126,8 @@ public sealed class MarketDataService
 
     private (DateTime From, DateTime To) ResolveWindow(DateTime? fromUtc, DateTime? toUtc)
     {
-        var to = (toUtc ?? _clock.UtcNow).ToUniversalTime();
-        var from = (fromUtc ?? to.AddHours(-1)).ToUniversalTime();
+        var to = AsUtc(toUtc ?? _clock.UtcNow);
+        var from = AsUtc(fromUtc ?? to.AddHours(-1));
 
         if (from > to)
         {
@@ -136,6 +136,14 @@ public sealed class MarketDataService
 
         return (from, to);
     }
+
+    /// <summary>Unspecified kinds (e.g. "2024-05-01T10:00:00") are treated as UTC, not local time.</summary>
+    internal static DateTime AsUtc(DateTime value) => value.Kind switch
+    {
+        DateTimeKind.Utc => value,
+        DateTimeKind.Local => value.ToUniversalTime(),
+        _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+    };
 
     private static void ValidateLimit(int limit)
     {
