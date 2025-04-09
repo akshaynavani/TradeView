@@ -27,6 +27,7 @@ public static class DependencyInjection
 
         services.AddScoped<IInstrumentRepository, InstrumentRepository>();
         services.AddScoped<IPriceTickRepository, PriceTickRepository>();
+        services.AddScoped<ITradeRepository, TradeRepository>();
 
         return services;
     }
