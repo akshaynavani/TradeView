@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<InstrumentService>();
         services.AddScoped<MarketDataService>();
+        services.AddScoped<PortfolioService>();
         return services;
     }
 }
