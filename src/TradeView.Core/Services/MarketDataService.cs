@@ -138,7 +138,7 @@ public sealed class MarketDataService
     }
 
     /// <summary>Unspecified kinds (e.g. "2024-05-01T10:00:00") are treated as UTC, not local time.</summary>
-    internal static DateTime AsUtc(DateTime value) => value.Kind switch
+    public static DateTime AsUtc(DateTime value) => value.Kind switch
     {
         DateTimeKind.Utc => value,
         DateTimeKind.Local => value.ToUniversalTime(),
