@@ -69,9 +69,14 @@ public static class AlertEvaluator
 
     /// <summary>Signed percent move from the reference price, or null when there is no reference.</summary>
     public static decimal? PercentMove(PriceAlert alert, decimal price)
-        => alert.ReferencePrice is > 0 and var reference
-            ? (price - reference.Value) / reference.Value * 100m
-            : null;
+    {
+        if (alert.ReferencePrice is not { } reference || reference <= 0)
+        {
+            return null;
+        }
+
+        return (price - reference) / reference * 100m;
+    }
 
     private static bool IsCoolingDown(PriceAlert alert, DateTime nowUtc)
         => alert.LastTriggeredAtUtc.HasValue
