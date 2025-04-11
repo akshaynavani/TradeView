@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradeView.Core.Abstractions;
 using TradeView.Infrastructure.MarketData;
+using TradeView.Infrastructure.Notifications;
 using TradeView.Infrastructure.Persistence;
 using TradeView.Infrastructure.Repositories;
 
@@ -28,6 +29,8 @@ public static class DependencyInjection
         services.AddScoped<IInstrumentRepository, InstrumentRepository>();
         services.AddScoped<IPriceTickRepository, PriceTickRepository>();
         services.AddScoped<ITradeRepository, TradeRepository>();
+        services.AddScoped<IAlertRepository, AlertRepository>();
+        services.AddScoped<IAlertNotifier, LoggingAlertNotifier>();
 
         return services;
     }
