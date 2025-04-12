@@ -5,7 +5,8 @@ using TradeView.Infrastructure.MarketData;
 namespace TradeView.Api.BackgroundServices;
 
 /// <summary>
-/// Polls the market data feed on a fixed interval, persists ticks, and periodically prunes old history.
+/// Polls the market data feed on a fixed interval, persists ticks, evaluates price alerts against
+/// the new prices, and periodically prunes old history.
 /// Each cycle runs in its own DI scope so it gets a fresh DbContext.
 /// </summary>
 public sealed class MarketDataIngestionService : BackgroundService
@@ -64,8 +65,16 @@ public sealed class MarketDataIngestionService : BackgroundService
         await using var scope = _scopeFactory.CreateAsyncScope();
         var marketData = scope.ServiceProvider.GetRequiredService<MarketDataService>();
 
+        var alerts = scope.ServiceProvider.GetRequiredService<AlertService>();
+
         var ticks = await marketData.IngestAsync(cancellationToken);
         _logger.LogDebug("Ingested {Count} ticks", ticks.Count);
+
+        var triggers = await alerts.EvaluateAsync(ticks, cancellationToken);
+        if (triggers.Count > 0)
+        {
+            _logger.LogInformation("{Count} price alert(s) fired", triggers.Count);
+        }
 
         if (options.TickRetentionHours > 0 && DateTime.UtcNow - _lastPruneUtc > PruneInterval)
         {
