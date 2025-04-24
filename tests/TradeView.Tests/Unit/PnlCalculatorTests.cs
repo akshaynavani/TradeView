@@ -122,10 +122,12 @@ public class PnlCalculatorTests
     [InlineData(-1, 100, 0)]
     [InlineData(1, 0, 0)]
     [InlineData(1, 100, -1)]
-    public void Invalid_trade_values_are_rejected(decimal quantity, decimal price, decimal fees)
+    public void Invalid_trade_values_are_rejected(int quantity, int price, int fees)
     {
+        var trade = Buy(quantity, price, fees);
+
         Assert.Throws<DomainValidationException>(() =>
-            PnlCalculator.Calculate(InstrumentId, Symbol, new[] { Buy(quantity, price, fees) }, marketPrice: null));
+            PnlCalculator.Calculate(InstrumentId, Symbol, new[] { trade }, marketPrice: null));
     }
 
     [Fact]
