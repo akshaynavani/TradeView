@@ -54,7 +54,9 @@ public sealed class SimulatedMarketDataFeed : IMarketDataFeed
 
             var (z, volumeNoise) = NextNoise();
             var next = (decimal)((double)previous * Math.Exp(_mu + _sigma * z));
-            next = Math.Round(Math.Max(next, 0.0001m), DecimalsFor(instrument), MidpointRounding.AwayFromZero);
+            var decimals = DecimalsFor(instrument);
+            var minimumTick = 1m / (decimal)Math.Pow(10, decimals);
+            next = Math.Max(Math.Round(next, decimals, MidpointRounding.AwayFromZero), minimumTick);
 
             // Volume loosely scales with the size of the move.
             var volume = Math.Round((decimal)(100 + 900 * volumeNoise * (1 + Math.Abs(z))), 2);
